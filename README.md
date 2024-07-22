@@ -182,7 +182,7 @@ action\_result\.message | string |
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
-## action: 'get_user'
+## action: 'get user'
 Get User details
 
 Type: **generic**  
