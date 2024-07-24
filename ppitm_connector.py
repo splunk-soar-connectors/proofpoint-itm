@@ -1,11 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom PP ITM python file by Asher Lee
-# Initial Dev by Asher Lee (BOQ)
-# Supported Dev by John Wang (Splunk)
-# Additional Dev by <NAME> (Splunk)
-# -----------------------------------------
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals

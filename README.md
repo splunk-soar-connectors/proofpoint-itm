@@ -1,6 +1,6 @@
 # Proofpoint ITM SOAR App
 
-Publisher: Asher @ BOQ  
+Publisher: Splunk  
 Connector Version: 1\.0\.0  
 Product Vendor: Proofpoint  
 Product Name: ITM  
