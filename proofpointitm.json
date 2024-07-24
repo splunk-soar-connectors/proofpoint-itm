@@ -9,13 +9,13 @@
     "product_name": "ITM",
     "python_version": "3",
     "product_version_regex": ".*",
-    "publisher": "Asher @ BOQ",
+    "publisher": "Splunk",
     "contributors": [
         {
             "name": "Patryk Dros"
         }
     ],
-    "license": "Copyright (c) Asher @ BOQ, 2024",
+    "license": "Copyright (c) Splunk, 2024",
     "app_version": "1.0.0",
     "utctime_updated": "2024-06-16T04:47:50.741129Z",
     "package_name": "phantom_proofpointitm",
