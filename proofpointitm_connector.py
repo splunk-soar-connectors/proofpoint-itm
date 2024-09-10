@@ -392,22 +392,22 @@ class PpItmConnector(BaseConnector):
         self.save_progress("#####################################")
 
         parameters = {
-            'alias': param['username'],
-            'status': param['status'],
-            'assignments': param['assignments'],
-            'includeInactivePolicies': param['includeInactivePolicies'],
-            'details.user.firstName': param['detailsuserfirstname'],
-            'details.user.lastName': param['detailsuserlastname']
+            'alias': param.get('username'),
+            'status': param.get('status'),
+            'assignments': param.get('assignments'),
+            'includeInactivePolicies': param.get('includeInactivePolicies'),
+            'details.user.firstName': param.get('detailsuserfirstname'),
+            'details.user.lastName': param.get('detailsuserlastname')
         }
 
         if param.get('offset'):
-            parameters.update({'offset': int(param['offset'])})
+            parameters.update({'offset': int(param.get('offset'))})
 
         if param.get('limit'):
-            parameters.update({'limit': int(param['limit'])})
+            parameters.update({'limit': int(param.get('limit'))})
 
         if param.get('includes'):
-            parameters.update({'includes': param['includes']})
+            parameters.update({'includes': param.get('includes')})
 
         theEndpoint = "/auth/users"
 
