@@ -260,9 +260,8 @@ class PpItmConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         self.save_progress("#####################################")
 
-        attachments = param.get('attachments')
         stream = param.get('stream')
-        fqid = param['fqid']
+        fqid = param.get('fqid')
 
         theEndpoint = "/activity/events/{fqid}/messages/default/contents/_raw?stream={stream}".format(fqid=fqid, stream=stream)
 
@@ -292,7 +291,7 @@ class PpItmConnector(BaseConnector):
         fqid = param['fqid']
 
         post_data = {
-            "id": param['assignee_id']
+            "id": param.get('assignee_id')
         }
 
         theEndpoint = "/activity/events/{}/annotations/workflow/assignment".format(fqid)
@@ -322,7 +321,6 @@ class PpItmConnector(BaseConnector):
         self.save_progress("#####################################")
 
         fqid = param.get('fqid', '')
-        includes = param.get('includes', '')
         theEndpoint = "/activity/events/{0}".format(fqid)
 
         # make rest call
@@ -391,8 +389,7 @@ class PpItmConnector(BaseConnector):
     def _handle_get_users(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        parentStatuses = param.get('parentStatuses', '')
+        self.save_progress("#####################################")
 
         parameters = {
             'alias': param['username'],
@@ -411,10 +408,6 @@ class PpItmConnector(BaseConnector):
 
         if param.get('includes'):
             parameters.update({'includes': param['includes']})
-
-        parentStatuses_attrib = ""
-        if parentStatuses != "" and parentStatuses != "--":
-            parentStatuses_attrib = "status={0}&".format(parentStatuses)
 
         theEndpoint = "/auth/users"
 

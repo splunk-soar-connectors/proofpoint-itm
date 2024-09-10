@@ -42,7 +42,7 @@
             "order": 2
         },
         "api_version": {
-            "description": "v1 / v2 / v3",
+            "description": "API version: v1 / v2 / v3",
             "data_type": "string",
             "value_list": [
                 "v1",
@@ -525,7 +525,7 @@
             "action": "get user",
             "identifier": "get_user",
             "description": "Get User details",
-            "verbose": "get a list of all users and their user attributes, or search the system for a single user id by username/string all values are optional.",
+            "verbose": "Get a list of all users and their user attributes, or search the system for a single user id by username/string all values are optional.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -553,27 +553,27 @@
                     "order": 2
                 },
                 "includeinactivepolicies": {
-                    "description": "includeInactivePolicies (use true / false)",
+                    "description": "IncludeInactivePolicies (use true / false)",
                     "data_type": "string",
                     "value_list": [
                         "true",
                         "false"
                     ],
                     "default": "false",
-                    "order": 4
+                    "order": 3
                 },
                 "detailsuserfirstname": {
-                    "description": "select by firstName of user. Use * for wildcards",
+                    "description": "Select by firstName of user. Use * for wildcards",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "detailsuserlastname": {
+                    "description": "Select by lastName of user. Use * for wildcards",
                     "data_type": "string",
                     "order": 5
                 },
-                "detailsuserlastname": {
-                    "description": "select by lastName of user. Use * for wildcards",
-                    "data_type": "string",
-                    "order": 6
-                },
                 "includes": {
-                    "description": "resource to get extra data like tenant, policy-assignments, etc",
+                    "description": "Resource to get extra data like tenant, policy-assignments, etc",
                     "data_type": "string",
                     "value_list": [
                         "relations.trusted",
@@ -588,10 +588,10 @@
                         "tenant",
                         "policy-assignments"
                     ],
-                    "order": 7
+                    "order": 6
                 },
                 "parentstatuses": {
-                    "description": "statuses of parent entity",
+                    "description": "Statuses of parent entity",
                     "data_type": "string",
                     "value_list": [
                         "active",
@@ -599,19 +599,19 @@
                         "pending",
                         "deleted"
                     ],
-                    "order": 8
+                    "order": 7
                 },
                 "limit": {
-                    "description": "max records to return (defaults to 100)",
+                    "description": "Max records to return (defaults to 100)",
                     "data_type": "numeric",
                     "default": "100",
-                    "order": 9
+                    "order": 8
                 },
                 "offset": {
-                    "description": "number of records to skip (defaults to 0)",
+                    "description": "Number of records to skip (defaults to 0)",
                     "data_type": "numeric",
                     "default": "0",
-                    "order": 10
+                    "order": 9
                 }
             },
             "output": [
