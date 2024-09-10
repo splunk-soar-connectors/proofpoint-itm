@@ -4,12 +4,12 @@
     "description": "Proofpoint ITM 4 SOAR - Also know as ObserveIT by Proofpoint, or Proofpoint Insider Threat Management",
     "type": "information",
     "product_vendor": "Proofpoint",
-    "logo": "proofpointitm.png",
-    "logo_dark": "proofpointitm_dark.png",
+    "logo": "logo_proofpointitm.svg",
+    "logo_dark": "logo_proofpointitm_dark.svg",
     "product_name": "ITM",
     "python_version": "3",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
+    "publisher": "Splunk Community",
     "contributors": [
         {
             "name": "Patryk Dros"
@@ -20,46 +20,37 @@
     "utctime_updated": "2024-06-16T04:47:50.741129Z",
     "package_name": "phantom_proofpointitm",
     "main_module": "ppitm_connector.py",
-    "min_phantom_version": "6.2.0.355",
+    "min_phantom_version": "6.2.1",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "client_id": {
             "description": "Client ID",
             "data_type": "string",
             "required": true,
-            "order": 0,
-            "name": "client_id",
-            "id": 0
+            "order": 0
         },
         "client_secret": {
             "description": "Client Secret",
             "data_type": "password",
             "required": true,
-            "order": 1,
-            "name": "client_secret",
-            "id": 1
+            "order": 1
         },
         "base_url": {
             "description": "Base URL / Domain, i.e https://xyz.proofpoint.com",
             "data_type": "string",
             "required": true,
-            "order": 2,
-            "name": "base_url",
-            "id": 2
+            "order": 2
         },
         "api_version": {
             "description": "v1 / v2 / v3",
             "data_type": "string",
-            "required": false,
             "value_list": [
                 "v1",
                 "v2",
                 "v3"
             ],
             "default": "v2",
-            "order": 3,
-            "name": "api_version",
-            "id": 3
+            "order": 3
         }
     },
     "actions": [
@@ -67,7 +58,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -78,22 +68,17 @@
             "action": "get email",
             "identifier": "get_email",
             "description": "Get an email from the server",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "fqid": {
                     "description": "Message ID to get",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "email id"
                     ],
-                    "order": 0,
-                    "name": "fqid",
-                    "id": 1,
-                    "param_name": "fqid"
+                    "order": 0
                 },
                 "attachments": {
                     "description": "Include Attachments",
@@ -103,10 +88,7 @@
                         "true"
                     ],
                     "default": "false",
-                    "order": 1,
-                    "name": "attachments",
-                    "id": 2,
-                    "param_name": "attachments"
+                    "order": 1
                 },
                 "stream": {
                     "description": "Stream Response",
@@ -116,43 +98,48 @@
                         "false"
                     ],
                     "default": "true",
-                    "order": 2,
-                    "name": "stream",
-                    "id": 3,
-                    "param_name": "stream"
+                    "order": 2
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
                 {
                     "data_path": "action_result.parameter.fqid",
                     "data_type": "string",
                     "contains": [
                         "email id"
                     ],
-                    "column_name": "fqid",
+                    "column_name": "Fqid",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.attachments",
                     "data_type": "string",
-                    "contains": [
-                        "email"
-                    ],
-                    "column_name": "attachments",
+                    "column_name": "Attachments",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.stream",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "stream",
+                    "column_name": "Stream",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 3
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -176,56 +163,52 @@
             "action": "assign owner",
             "identifier": "update_ticket",
             "description": "Update ticket (issue) to be owned by this person",
-            "verbose": "Assign Ticket to user as per the UI values in PP ITM Portal",
-            "type": "investigate",
+            "verbose": "Assign Ticket to user as per the UI values in PP ITM Portal.",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "fqid": {
                     "description": "Issue ID",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "order": 0,
-                    "name": "fqid",
-                    "id": 1,
-                    "param_name": "fqid"
+                    "order": 0
                 },
                 "assignee_id": {
                     "description": "Assign Ticket to this person by ID",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "contains": [
-                        "user ID"
-                    ],
-                    "order": 1,
-                    "name": "assignee_id",
-                    "id": 2,
-                    "param_name": "assignee_id"
+                    "order": 1
                 }
             },
             "output": [
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.fqid",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "fqid",
+                    "column_name": "Fqid",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.assignee",
+                    "data_path": "action_result.parameter.assignee_id",
                     "data_type": "string",
-                    "contains": [
-                        "user name"
-                    ],
-                    "column_name": "assignee",
+                    "column_name": "Assignee_ID",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -301,58 +284,43 @@
             "action": "get ticket",
             "identifier": "get_ticket",
             "description": "Get ticket (issue) information",
-            "verbose": "",
-            "type": "generic",
+            "type": "investigate",
             "read_only": true,
             "parameters": {
                 "fqid": {
                     "description": "Ticket (Issue) FQID",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "order": 0,
-                    "name": "fqid",
-                    "id": 1,
-                    "param_name": "fqid"
+                    "order": 0
                 },
                 "includes": {
                     "description": "Includes (Screenshots/---)",
                     "data_type": "string",
-                    "order": 1,
-                    "name": "includes",
-                    "id": 2,
-                    "param_name": "includes"
+                    "order": 1
                 }
             },
             "output": [
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.0._status.code",
                     "data_type": "string",
-                    "contains": [
-                        "Proofpoint API request status code"
-                    ],
                     "example_values": [
-                        "it:error:none",
                         "it:error:some-error"
                     ]
                 },
                 {
                     "data_path": "action_result.data.0._status.status",
                     "data_type": "string",
-                    "contains": [
-                        "Proofpoint API request status number"
-                    ],
                     "example_values": [
-                        "0",
                         "400"
                     ]
                 },
                 {
                     "data_path": "action_result.data.0._status.message",
                     "data_type": "string",
-                    "contains": [
-                        "Proofpoint API request error message (Only present when errors return)"
-                    ],
                     "example_values": [
                         "Error obtaining data for event '4242cfb7-edc4-47e0-b8a1-aa547562bcba' with name 'Nice Name'"
                     ]
@@ -360,12 +328,8 @@
                 {
                     "data_path": "action_result.data.0.annotations.comments.*.text",
                     "data_type": "string",
-                    "contains": [
-                        "The contents of COMMENTS in the alert."
-                    ],
                     "example_values": [
-                        "This is a note or comment in PP ITM",
-                        "SNOW INC# INC1234567"
+                        "This is a note or comment in PP ITM"
                     ]
                 },
                 {
@@ -375,35 +339,21 @@
                 {
                     "data_path": "action_result.data.0.annotations.workflow.state.*",
                     "data_type": "string",
-                    "contains": [
-                        "Replace * with state, assignee etc, there are a few options"
-                    ],
                     "example_values": [
-                        "status : incident:status:new",
-                        "assignee : 123412341234"
+                        "status : incident:status:new"
                     ]
                 },
                 {
                     "data_path": "action_result.data.0.indicators.*.name",
                     "data_type": "string",
-                    "contains": [
-                        "The name of the indicator that triggered this alert, multiple fields could be present"
-                    ],
                     "example_values": [
-                        "Whatever you configure in PP ITM",
-                        "Credit Card Number",
-                        "Date Of Birth"
+                        "Whatever you configure in PP ITM"
                     ]
                 },
                 {
                     "data_path": "action_result.data.0.messages.*.subject",
                     "data_type": "string",
-                    "contains": [
-                        "The subject line from the sent email"
-                    ],
                     "example_values": [
-                        "Hi Mum!",
-                        "I am not exfiltrating corporate data",
                         "Greetings from Nigeria"
                     ]
                 },
@@ -417,9 +367,6 @@
                 {
                     "data_path": "action_result.data.0.messages.*.recipients.*.email",
                     "data_type": "string",
-                    "contains": [
-                        "The email addresses for the recipients, there are TO's CC's and BCC's sll here"
-                    ],
                     "example_values": [
                         "user.name@domain.name.com"
                     ]
@@ -427,78 +374,52 @@
                 {
                     "data_path": "action_result.data.0.incident.status",
                     "data_type": "string",
-                    "contains": [
-                        "The current STATUS as defined by your org, my org doesnt track disposition seperately in ITM so thus its like this"
-                    ],
                     "example_values": [
-                        "incident:status:new",
-                        "incident:status:in_progress",
-                        "incident:status:closed_accident",
-                        "incident:status:closed_deliberate",
-                        "incident:status:closed_false_postive"
+                        "incident:status:new"
                     ]
                 },
                 {
                     "data_path": "action_result.data.0.incident.name",
                     "data_type": "string",
-                    "contains": [
-                        "The name of the rule that caused the incident"
-                    ],
                     "example_values": [
-                        "EMAIL-DLP-PCI",
-                        "Email DLP stolen documents",
-                        "Email dlp dob",
-                        "email dlp pii",
-                        "email dlp cc number"
+                        "EMAIL-DLP-PCI"
                     ]
                 },
                 {
                     "data_path": "action_result.data.0.incident.severity",
                     "data_type": "string",
-                    "contains": [
-                        "How bad this incident is on a scale of 0 to ten billion"
-                    ],
                     "example_values": [
-                        "incident:severity:850:critical",
-                        "incident:severity:600:high",
-                        "incident:severity:400:med",
-                        "incident:severity:200:low",
-                        "incident:severity:100:info"
+                        "incident:severity:850:critical"
                     ]
                 },
                 {
                     "data_path": "action_result.data.0.custom.*",
                     "data_type": "string",
-                    "contains": [
-                        "If your org puts in custom stuff for the system it will appear here somehow"
-                    ],
                     "example_values": [
-                        "we are cool",
-                        "Thanks be to Asher Lee",
-                        "Thanks be to John Wang",
-                        "Hi Joshua from IR",
                         "Do you think i will have to take this out?"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.fqid",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "fqid",
+                    "column_name": "Fqid",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.includes",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "includes",
+                    "column_name": "Includes",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -522,7 +443,6 @@
             "action": "add comment",
             "identifier": "add_comment",
             "description": "Add a comment to a ticket",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -530,58 +450,58 @@
                     "description": "FQID for Alert",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "order": 0,
-                    "name": "fqid",
-                    "id": 1,
-                    "param_name": "fqid"
+                    "order": 0
                 },
                 "comment": {
                     "description": "Comment to add",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 1,
-                    "name": "comment",
-                    "id": 2,
-                    "param_name": "comment"
+                    "order": 1
                 },
                 "kind": {
                     "description": "Kind",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "default": "it:comment:note",
-                    "order": 2,
-                    "name": "kind",
-                    "id": 3,
-                    "param_name": "kind"
+                    "order": 2
                 }
             },
             "output": [
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.fqid",
                     "data_type": "string",
-                    "column_name": "fqid",
+                    "column_name": "Fqid",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
-                    "column_name": "comment",
+                    "column_name": "Comment",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.kind",
                     "data_type": "string",
-                    "column_name": "kind",
+                    "column_name": "Kind",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 3
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -602,28 +522,21 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get_user",
+            "action": "get user",
             "identifier": "get_user",
             "description": "Get User details",
-            "verbose": "get a list of all users and their user attributes, or search the system for a single user id by username/string all values are optional",
+            "verbose": "get a list of all users and their user attributes, or search the system for a single user id by username/string all values are optional.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "username": {
                     "description": "Username user.name@email.com (also note * is permited... *@blah.com)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "order": 0,
-                    "name": "username",
-                    "id": 1,
-                    "param_name": "username"
+                    "order": 0
                 },
                 "status": {
                     "description": "User Status (Multi Value CSV eg: active,pending)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "active",
                         "inactive",
@@ -632,55 +545,32 @@
                         "error"
                     ],
                     "default": "active",
-                    "order": 1,
-                    "name": "status",
-                    "id": 2,
-                    "param_name": "status"
+                    "order": 1
                 },
                 "assignments": {
                     "description": "Assignments groups",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "order": 2,
-                    "name": "assignments",
-                    "id": 3,
-                    "param_name": "assignments"
+                    "order": 2
                 },
                 "includeinactivepolicies": {
                     "description": "includeInactivePolicies (use true / false)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "true",
                         "false"
                     ],
                     "default": "false",
-                    "order": 4,
-                    "name": "includeinactivepolicies",
-                    "id": 5,
-                    "param_name": "includeinactivepolicies"
+                    "order": 4
                 },
                 "detailsuserfirstname": {
                     "description": "select by firstName of user. Use * for wildcards",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "order": 5,
-                    "name": "detailsuserfirstname",
-                    "id": 6,
-                    "param_name": "detailsuserfirstname"
+                    "order": 5
                 },
                 "detailsuserlastname": {
                     "description": "select by lastName of user. Use * for wildcards",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "order": 6,
-                    "name": "detailsuserlastname",
-                    "id": 7,
-                    "param_name": "detailsuserlastname"
+                    "order": 6
                 },
                 "includes": {
                     "description": "resource to get extra data like tenant, policy-assignments, etc",
@@ -698,11 +588,7 @@
                         "tenant",
                         "policy-assignments"
                     ],
-                    "default": "",
-                    "order": 7,
-                    "name": "includes",
-                    "id": 8,
-                    "param_name": "includes"
+                    "order": 7
                 },
                 "parentstatuses": {
                     "description": "statuses of parent entity",
@@ -713,108 +599,99 @@
                         "pending",
                         "deleted"
                     ],
-                    "default": "",
-                    "order": 8,
-                    "name": "parentstatuses",
-                    "id": 9,
-                    "param_name": "parentstatuses"
+                    "order": 8
                 },
                 "limit": {
                     "description": "max records to return (defaults to 100)",
                     "data_type": "numeric",
                     "default": "100",
-                    "order": 9,
-                    "name": "limit",
-                    "id": 10,
-                    "param_name": "limit"
+                    "order": 9
                 },
-                
                 "offset": {
                     "description": "number of records to skip (defaults to 0)",
                     "data_type": "numeric",
                     "default": "0",
-                    "order": 10,
-                    "name": "offset",
-                    "id": 11,
-                    "param_name": "offset"
+                    "order": 10
                 }
             },
             "output": [
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.username",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "username",
+                    "column_name": "Username",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.status",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.assignments",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "assignments",
+                    "column_name": "Assignments",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.includes",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "includes",
+                    "column_name": "Includes",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.parentstatuses",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "parentstatuses",
+                    "column_name": "Parentstatuses",
                     "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.includeinactivepolicies",
                     "data_type": "boolean",
-                    "contains": [],
-                    "column_name": "includeinactivepolicies",
+                    "column_name": "Includeinactivepolicies",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.parameter.limit",
                     "data_type": "numeric",
-                    "contains": [],
-                    "column_name": "limit",
+                    "column_name": "Limit",
                     "column_order": 6
                 },
                 {
                     "data_path": "action_result.parameter.detailsuserfirstname",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "detailsuserfirstname",
+                    "column_name": "Detailsuserfirstname",
                     "column_order": 7
                 },
                 {
                     "data_path": "action_result.parameter.detailsuserlastname",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "detailsuserlastname",
+                    "column_name": "Detailsuserlastname",
                     "column_order": 8
                 },
                 {
                     "data_path": "action_result.parameter.offset",
                     "data_type": "numeric",
-                    "contains": [],
-                    "column_name": "offset",
+                    "column_name": "Offset",
                     "column_order": 9
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 10
+                    "column_name": "Status",
+                    "column_order": 10,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -838,7 +715,6 @@
             "action": "set status",
             "identifier": "set_status",
             "description": "Set ticket (issue) status",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -846,107 +722,95 @@
                     "description": "Ticket (Issue) Key",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "order": 0,
-                    "name": "fqid",
-                    "id": 1,
-                    "param_name": "fqid"
+                    "order": 0
                 },
                 "status_id": {
                     "description": "Status ID",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 1,
-                    "name": "status_id",
-                    "id": 2,
-                    "param_name": "status_id"
+                    "order": 1
                 },
                 "status_title": {
                     "description": "Alias / Status title",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 2,
-                    "name": "status_title",
-                    "id": 3,
-                    "param_name": "status_title"
+                    "order": 2
                 },
                 "status_category": {
                     "description": "Status Category",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "default": "it:workflow:disposition:category:open:in-progress",
-                    "order": 3,
-                    "name": "status_category",
-                    "id": 4,
-                    "param_name": "status_category"
+                    "order": 3
                 },
                 "assignee_id": {
                     "description": "Assignee ID",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 4,
-                    "name": "assignee_id",
-                    "id": 5,
-                    "param_name": "assignee_id"
+                    "order": 4
                 },
                 "kind": {
                     "description": "Kind",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "default": "uim:incident:remediation:quarantine",
-                    "order": 5,
-                    "name": "kind",
-                    "id": 6,
-                    "param_name": "kind"
+                    "order": 5
                 }
             },
             "output": [
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.fqid",
                     "data_type": "string",
-                    "column_name": "fqid",
+                    "column_name": "Fqid",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.status_id",
                     "data_type": "string",
-                    "column_name": "status_id",
+                    "column_name": "Status ID",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.status_title",
                     "data_type": "string",
-                    "column_name": "status_title",
+                    "column_name": "Status Title",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.status_category",
                     "data_type": "string",
-                    "column_name": "status_category",
+                    "column_name": "Status Category",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.assignee_id",
                     "data_type": "string",
-                    "column_name": "assignee_id",
+                    "column_name": "Assignee ID",
                     "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.kind",
                     "data_type": "string",
-                    "column_name": "kind",
+                    "column_name": "Kind",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 6
+                    "column_name": "Status",
+                    "column_order": 6,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -974,5 +838,6 @@
     "version": 1,
     "appname": "-",
     "executable": "spawn3",
-    "disabled": false
+    "disabled": false,
+    "fips_compliant": false
 }
