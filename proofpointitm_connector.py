@@ -386,7 +386,7 @@ class PpItmConnector(BaseConnector):
         self.save_progress("#####################################")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_get_users(self, param):
+    def _handle_get_user(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         self.save_progress("#####################################")
@@ -497,7 +497,7 @@ class PpItmConnector(BaseConnector):
             ret_val = self._handle_add_comment(param)
 
         if action_id == 'get_user':
-            ret_val = self._handle_get_users(param)
+            ret_val = self._handle_get_user(param)
 
         if action_id == 'set_status':
             ret_val = self._handle_set_status(param)

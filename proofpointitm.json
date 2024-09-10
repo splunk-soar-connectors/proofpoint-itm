@@ -19,7 +19,7 @@
     "app_version": "1.0.0",
     "utctime_updated": "2024-06-16T04:47:50.741129Z",
     "package_name": "phantom_proofpointitm",
-    "main_module": "ppitm_connector.py",
+    "main_module": "proofpointitm_connector.py",
     "min_phantom_version": "6.2.1",
     "app_wizard_version": "1.0.0",
     "configuration": {
