@@ -20,7 +20,8 @@
     "utctime_updated": "2024-06-16T04:47:50.741129Z",
     "package_name": "phantom_proofpointitm",
     "main_module": "proofpointitm_connector.py",
-    "min_phantom_version": "6.2.1",
+    "min_phantom_version": "6.2.0.355",
+    "fips_compliant": false,
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
@@ -596,13 +597,13 @@
                 "limit": {
                     "description": "Max records to return (defaults to 100)",
                     "data_type": "numeric",
-                    "default": "100",
+                    "default": 100,
                     "order": 8
                 },
                 "offset": {
                     "description": "Number of records to skip (defaults to 0)",
                     "data_type": "numeric",
-                    "default": "0",
+                    "default": 0,
                     "order": 9
                 }
             },
@@ -830,6 +831,5 @@
     "version": 1,
     "appname": "-",
     "executable": "spawn3",
-    "disabled": false,
-    "fips_compliant": false
+    "disabled": false
 }
