@@ -16,7 +16,7 @@
         }
     ],
     "license": "Copyright (c) Splunk, 2024",
-    "app_version": "1.0.0",
+    "app_version": "1.0.1",
     "utctime_updated": "2024-06-16T04:47:50.741129Z",
     "package_name": "phantom_proofpointitm",
     "main_module": "proofpointitm_connector.py",
