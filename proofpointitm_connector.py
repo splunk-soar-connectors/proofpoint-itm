@@ -55,41 +55,32 @@ class PpItmConnector(BaseConnector):
     def _process_stream_response(self, response, action_result):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, response.text)
-        return RetVal(
-            action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
-            ), None
-        )
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
 
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
             return RetVal(phantom.APP_SUCCESS, {})
-        return RetVal(
-            action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
-            ), None
-        )
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
 
     def _process_html_response(self, response, action_result):
         # An html response, treat it like an error
         status_code = response.status_code
 
         # Handle valid responses from ipinfo.io
-        if (status_code == 200):
+        if status_code == 200:
             return RetVal(phantom.APP_SUCCESS, response.text)
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
             error_text = soup.text
-            split_lines = error_text.split('\n')
+            split_lines = error_text.split("\n")
             split_lines = [x.strip() for x in split_lines if x.strip()]
-            error_text = '\n'.join(split_lines)
+            error_text = "\n".join(split_lines)
         except:
             error_text = "Cannot parse error details"
-            message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-            error_text)
-            message = message.replace('{', '{{').replace('}', '}}')
+            message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+            message = message.replace("{", "{{").replace("}", "}}")
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_html_response_orig(self, response, action_result):
@@ -99,13 +90,13 @@ class PpItmConnector(BaseConnector):
         try:
             soup = BeautifulSoup(response.text, "html.parser")
             error_text = soup.text
-            split_lines = error_text.split('\n')
+            split_lines = error_text.split("\n")
             split_lines = [x.strip() for x in split_lines if x.strip()]
-            error_text = '\n'.join(split_lines)
+            error_text = "\n".join(split_lines)
         except:
             error_text = "Cannot parse error details"
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace("{", "{{").replace("}", "}}")
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -113,61 +104,45 @@ class PpItmConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
-                ), None
-            )
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
         # You should process the error returned in the json
-        message = "Error from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
-        )
+        message = "Error from server. Status Code: {0} Data from server: {1}".format(r.status_code, r.text.replace("{", "{{").replace("}", "}}"))
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
-        if hasattr(action_result, 'add_debug_data'):
-            action_result.add_debug_data({'r_status_code': r.status_code})
-            action_result.add_debug_data({'r_text': r.text})
-            action_result.add_debug_data({'r_headers': r.headers})
+        if hasattr(action_result, "add_debug_data"):
+            action_result.add_debug_data({"r_status_code": r.status_code})
+            action_result.add_debug_data({"r_text": r.text})
+            action_result.add_debug_data({"r_headers": r.headers})
         # Process each 'Content-Type' of response separately
         # Process a json response
-        if 'json' in r.headers.get('Content-Type', ''):
+        if "json" in r.headers.get("Content-Type", ""):
             return self._process_json_response(r, action_result)
-        if 'octet-stream' in r.headers.get('Content-Type', ''):
+        if "octet-stream" in r.headers.get("Content-Type", ""):
             return self._process_stream_response(r, action_result)
 
         # Process an HTML response, Do this no matter what the api talks.
         # There is a high chance of a PROXY in between phantom and the rest of
         # world, in case of errors, PROXY's return HTML, this function parses
         # the error and adds it to the action_result.
-        if 'html' in r.headers.get('Content-Type', ''):
+        if "html" in r.headers.get("Content-Type", ""):
             return self._process_html_response(r, action_result)
         # it's not content-type that is to be parsed, handle an empty response
         if not r.text:
             return self._process_empty_response(r, action_result)
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code,
-            r.text.replace('{', '{{').replace('}', '}}')
+            r.status_code, r.text.replace("{", "{{").replace("}", "}}")
         )
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _get_token(self, action_result):
-        payload = {
-            'grant_type': 'client_credentials',
-            'client_id': self._client_id,
-            'client_secret': self._client_secret,
-            'scope': '*'
-        }
-        headers = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'accept': 'application/json'
-        }
+        payload = {"grant_type": "client_credentials", "client_id": self._client_id, "client_secret": self._client_secret, "scope": "*"}
+        headers = {"Content-Type": "application/x-www-form-urlencoded", "accept": "application/json"}
 
         url = self._base_url + "/auth/oauth/token"
 
@@ -183,9 +158,9 @@ class PpItmConnector(BaseConnector):
         self.save_progress("#---- ---- ** TOKEN RECEIVED ** ---- ----#")
 
         thaJSON = response.json()
-        self._access_token = thaJSON['access_token']
-        self._refresh_token = thaJSON['refresh_token']
-        self._token_type = thaJSON['token_type']
+        self._access_token = thaJSON["access_token"]
+        self._refresh_token = thaJSON["refresh_token"]
+        self._token_type = thaJSON["token_type"]
         self._status_code = response.status_code
         self._full_token = thaJSON
         self.save_progress("#GET-TOK: AUTH TOKEN sub-process completed: {0} #".format(self._status_code))
@@ -205,36 +180,24 @@ class PpItmConnector(BaseConnector):
                 return RetVal(action_result.get_status(), TOKENIZATION_ERR_MSG.format(error_message))
 
         if self._access_token:
-            headers = {
-                'headers': {
-                    "Authorization": BEARER_STRING.format(self._access_token),
-                    "Content-Type": "application/json"
-                }
-            }
+            headers = {"headers": {"Authorization": BEARER_STRING.format(self._access_token), "Content-Type": "application/json"}}
             kwargs.update(headers)
 
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(
-                action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)),
-                resp_json
-            )
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
         # Create a URL to connect to
         url = self._base_url + endpoint
         try:
             r = request_func(
                 url,
                 # auth=(username, password),  # basic authentication
-                verify=config.get('verify_server_cert', False),
-                **kwargs
+                verify=config.get("verify_server_cert", False),
+                **kwargs,
             )
         except Exception as e:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
-                ), resp_json
-            )
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
@@ -260,14 +223,12 @@ class PpItmConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         self.save_progress("#####################################")
 
-        stream = param.get('stream')
-        fqid = param.get('fqid')
+        stream = param.get("stream")
+        fqid = param.get("fqid")
 
         theEndpoint = "/activity/events/{fqid}/messages/default/contents/_raw?stream={stream}".format(fqid=fqid, stream=stream)
 
-        ret_val, response = self._make_rest_call(
-            theEndpoint, action_result, params=None, headers=None, method='get'
-        )
+        ret_val, response = self._make_rest_call(theEndpoint, action_result, params=None, headers=None, method="get")
 
         self.save_progress("ret_val: {0}".format(ret_val))
         self.save_progress("response: {0}".format(response))
@@ -288,18 +249,14 @@ class PpItmConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress("#####################################")
 
-        fqid = param['fqid']
+        fqid = param["fqid"]
 
-        post_data = {
-            "id": param.get('assignee_id')
-        }
+        post_data = {"id": param.get("assignee_id")}
 
         theEndpoint = "/activity/events/{}/annotations/workflow/assignment".format(fqid)
 
         # make rest call
-        ret_val, response = self._make_rest_call(
-            theEndpoint, action_result, params=None, headers=None, json=post_data, method='put'
-        )
+        ret_val, response = self._make_rest_call(theEndpoint, action_result, params=None, headers=None, json=post_data, method="put")
 
         self.save_progress("response: {0}".format(response))
         self.save_progress("ret_val: {0}".format(ret_val))
@@ -320,13 +277,11 @@ class PpItmConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         self.save_progress("#####################################")
 
-        fqid = param.get('fqid', '')
+        fqid = param.get("fqid", "")
         theEndpoint = "/activity/events/{0}".format(fqid)
 
         # make rest call
-        ret_val, response = self._make_rest_call(
-            theEndpoint, action_result, params=None, headers=None
-        )
+        ret_val, response = self._make_rest_call(theEndpoint, action_result, params=None, headers=None)
 
         self.save_progress("response: {0}".format(response))
         self.save_progress("ret_val: {0}".format(ret_val))
@@ -336,9 +291,9 @@ class PpItmConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Error during Get Ticket action executing, response: {}".format(response))
 
         construct_timeline = "{}/search/timeline?contextId={}&activityId={}&fqid={}&field=user.name&region=us-east-1&sources=email:pps"
-        construct_timeline.format(self._base_url.replace("apis", "apps"), response['contextId'], response['partitionKey'], fqid)
+        construct_timeline.format(self._base_url.replace("apis", "apps"), response["contextId"], response["partitionKey"], fqid)
 
-        timeline_url = {'timeline_url': construct_timeline}
+        timeline_url = {"timeline_url": construct_timeline}
 
         # Add the response into the data section
         action_result.add_data(response)
@@ -354,23 +309,13 @@ class PpItmConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         self.save_progress("#####################################")
 
-        fqid = param['fqid']
-        post_data = {
-            "data": [
-                {
-                    "alias": "string",
-                    "kind": param['kind'],
-                    "text": param['comment']
-                }
-            ]
-        }
+        fqid = param["fqid"]
+        post_data = {"data": [{"alias": "string", "kind": param["kind"], "text": param["comment"]}]}
 
         theEndpoint = "/activity/events/{fqid}/annotations/comments".format(fqid=fqid)
 
         # make rest call
-        ret_val, response = self._make_rest_call(
-            theEndpoint, action_result, method="post", params=None, headers=None, json=post_data
-        )
+        ret_val, response = self._make_rest_call(theEndpoint, action_result, method="post", params=None, headers=None, json=post_data)
 
         self.save_progress("ret_val: {0}".format(ret_val))
         self.save_progress("response: {0}".format(response))
@@ -392,28 +337,26 @@ class PpItmConnector(BaseConnector):
         self.save_progress("#####################################")
 
         parameters = {
-            'alias': param.get('username'),
-            'status': param.get('status'),
-            'assignments': param.get('assignments'),
-            'includeInactivePolicies': param.get('includeInactivePolicies'),
-            'details.user.firstName': param.get('detailsuserfirstname'),
-            'details.user.lastName': param.get('detailsuserlastname')
+            "alias": param.get("username"),
+            "status": param.get("status"),
+            "assignments": param.get("assignments"),
+            "includeInactivePolicies": param.get("includeInactivePolicies"),
+            "details.user.firstName": param.get("detailsuserfirstname"),
+            "details.user.lastName": param.get("detailsuserlastname"),
         }
 
-        if param.get('offset'):
-            parameters.update({'offset': int(param.get('offset'))})
+        if param.get("offset"):
+            parameters.update({"offset": int(param.get("offset"))})
 
-        if param.get('limit'):
-            parameters.update({'limit': int(param.get('limit'))})
+        if param.get("limit"):
+            parameters.update({"limit": int(param.get("limit"))})
 
-        if param.get('includes'):
-            parameters.update({'includes': param.get('includes')})
+        if param.get("includes"):
+            parameters.update({"includes": param.get("includes")})
 
         theEndpoint = "/auth/users"
 
-        ret_val, response = self._make_rest_call(
-            theEndpoint, action_result, params=parameters, headers=None, method='get'
-        )
+        ret_val, response = self._make_rest_call(theEndpoint, action_result, params=parameters, headers=None, method="get")
         self.save_progress("ret_val: {0}".format(ret_val))
         self.save_progress("response: {0}".format(response))
 
@@ -433,34 +376,20 @@ class PpItmConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         self.save_progress("#####################################")
 
-        fqid = param['fqid']
+        fqid = param["fqid"]
 
         post_data = {
             "state": {
-                "disposition": {
-                    "status": {
-                        "id": param['status_id'],
-                        "alias": param['status_title']
-                    },
-                    "category": param['status_category']
-                },
-                "assignee": {
-                    "id": param['assignee_id']
-                },
-                "actions": [
-                    {
-                        "kind": param['kind']
-                    }
-                ]
+                "disposition": {"status": {"id": param["status_id"], "alias": param["status_title"]}, "category": param["status_category"]},
+                "assignee": {"id": param["assignee_id"]},
+                "actions": [{"kind": param["kind"]}],
             }
         }
 
         theEndpoint = "/activity/events/{fqid}/annotations/workflow".format(fqid=fqid)
 
         # make rest call
-        ret_val, response = self._make_rest_call(
-            theEndpoint, action_result, method="patch", params=None, headers=None, json=post_data
-        )
+        ret_val, response = self._make_rest_call(theEndpoint, action_result, method="patch", params=None, headers=None, json=post_data)
 
         self.save_progress("ret_val: {0}".format(ret_val))
         self.save_progress("response: {0}".format(response))
@@ -484,25 +413,25 @@ class PpItmConnector(BaseConnector):
 
         self.debug_print("action_id", self.get_action_identifier())
 
-        if action_id == 'get_email':
+        if action_id == "get_email":
             ret_val = self._handle_get_email(param)
 
-        if action_id == 'update_ticket':
+        if action_id == "update_ticket":
             ret_val = self._handle_update_ticket(param)
 
-        if action_id == 'get_ticket':
+        if action_id == "get_ticket":
             ret_val = self._handle_get_ticket(param)
 
-        if action_id == 'add_comment':
+        if action_id == "add_comment":
             ret_val = self._handle_add_comment(param)
 
-        if action_id == 'get_user':
+        if action_id == "get_user":
             ret_val = self._handle_get_user(param)
 
-        if action_id == 'set_status':
+        if action_id == "set_status":
             ret_val = self._handle_set_status(param)
 
-        if action_id == 'test_connectivity':
+        if action_id == "test_connectivity":
             ret_val = self._handle_test_connectivity(param)
 
         return ret_val
@@ -515,10 +444,9 @@ class PpItmConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._base_url = '{base_url}/{api_version}/apis'.format(base_url=config['base_url'],
-                                                                api_version=config.get('api_version'))
-        self._client_id = config['client_id']
-        self._client_secret = config['client_secret']
+        self._base_url = "{base_url}/{api_version}/apis".format(base_url=config["base_url"], api_version=config.get("api_version"))
+        self._client_id = config["client_id"]
+        self._client_secret = config["client_secret"]
 
         return phantom.APP_SUCCESS
 
@@ -534,10 +462,10 @@ def main():
 
     argparser = argparse.ArgumentParser()
 
-    argparser.add_argument('input_test_json', help='Input Test JSON file')
-    argparser.add_argument('-u', '--username', help='username', required=False)
-    argparser.add_argument('-p', '--password', help='password', required=False)
-    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
+    argparser.add_argument("input_test_json", help="Input Test JSON file")
+    argparser.add_argument("-u", "--username", help="username", required=False)
+    argparser.add_argument("-p", "--password", help="password", required=False)
+    argparser.add_argument("-v", "--verify", action="store_true", help="verify", required=False, default=False)
 
     args = argparser.parse_args()
     session_id = None
@@ -549,28 +477,29 @@ def main():
 
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
     if username and password:
         try:
-            login_url = PpItmConnector._get_phantom_base_url() + '/login'
+            login_url = PpItmConnector._get_phantom_base_url() + "/login"
 
             print("Accessing the Login page")
             r = requests.get(login_url, verify=verify)
-            csrftoken = r.cookies['csrftoken']
+            csrftoken = r.cookies["csrftoken"]
 
             data = dict()
-            data['username'] = username
-            data['password'] = password
-            data['csrfmiddlewaretoken'] = csrftoken
+            data["username"] = username
+            data["password"] = password
+            data["csrfmiddlewaretoken"] = csrftoken
 
             headers = dict()
-            headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = login_url
+            headers["Cookie"] = "csrftoken=" + csrftoken
+            headers["Referer"] = login_url
 
             print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=verify, data=data, headers=headers)
-            session_id = r2.cookies['sessionid']
+            session_id = r2.cookies["sessionid"]
         except Exception as e:
             print("Unable to get session id from the platform. Error: " + str(e))
             sys.exit(1)
@@ -584,8 +513,8 @@ def main():
         connector.print_progress_message = True
 
         if session_id is not None:
-            in_json['user_session_token'] = session_id
-            connector._set_csrf_info(csrftoken, headers['Referer'])
+            in_json["user_session_token"] = session_id
+            connector._set_csrf_info(csrftoken, headers["Referer"])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
@@ -593,5 +522,5 @@ def main():
     sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
