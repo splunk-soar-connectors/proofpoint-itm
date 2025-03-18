@@ -1,6 +1,6 @@
 # File: proofpointitm_connector.py
 #
-# Copyright (c) Splunk, 2024
+# Copyright (c) Splunk, 2024-2025
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
-from __future__ import print_function, unicode_literals
 
 import json
 
@@ -36,7 +35,7 @@ class RetVal(tuple):
 class PpItmConnector(BaseConnector):
     def __init__(self):
         # Call the BaseConnectors init first
-        super(PpItmConnector, self).__init__()
+        super().__init__()
         self._state = None
 
         # Variable to hold a base_url in case the app makes REST calls
@@ -79,7 +78,7 @@ class PpItmConnector(BaseConnector):
             error_text = "\n".join(split_lines)
         except:
             error_text = "Cannot parse error details"
-            message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+            message = f"Status Code: {status_code}. Data from server:\n{error_text}\n"
             message = message.replace("{", "{{").replace("}", "}}")
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -95,7 +94,7 @@ class PpItmConnector(BaseConnector):
             error_text = "\n".join(split_lines)
         except:
             error_text = "Cannot parse error details"
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = f"Status Code: {status_code}. Data from server:\n{error_text}\n"
         message = message.replace("{", "{{").replace("}", "}}")
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -104,12 +103,12 @@ class PpItmConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Unable to parse JSON response. Error: {e!s}"), None)
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
         # You should process the error returned in the json
-        message = "Error from server. Status Code: {0} Data from server: {1}".format(r.status_code, r.text.replace("{", "{{").replace("}", "}}"))
+        message = "Error from server. Status Code: {} Data from server: {}".format(r.status_code, r.text.replace("{", "{{").replace("}", "}}"))
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
@@ -135,7 +134,7 @@ class PpItmConnector(BaseConnector):
         if not r.text:
             return self._process_empty_response(r, action_result)
         # everything else is actually an error at this point
-        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
+        message = "Can't process response from server. Status Code: {} Data from server: {}".format(
             r.status_code, r.text.replace("{", "{{").replace("}", "}}")
         )
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -163,8 +162,8 @@ class PpItmConnector(BaseConnector):
         self._token_type = thaJSON["token_type"]
         self._status_code = response.status_code
         self._full_token = thaJSON
-        self.save_progress("#GET-TOK: AUTH TOKEN sub-process completed: {0} #".format(self._status_code))
-        self.save_progress("#GET-TOK: token vars set if token type set, TOKEN-TYPE = {0} #".format(self._token_type))
+        self.save_progress(f"#GET-TOK: AUTH TOKEN sub-process completed: {self._status_code} #")
+        self.save_progress(f"#GET-TOK: token vars set if token type set, TOKEN-TYPE = {self._token_type} #")
 
         return phantom.APP_SUCCESS
 
@@ -186,7 +185,7 @@ class PpItmConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
         # Create a URL to connect to
         url = self._base_url + endpoint
         try:
@@ -197,7 +196,7 @@ class PpItmConnector(BaseConnector):
                 **kwargs,
             )
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {e!s}"), resp_json)
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
@@ -220,22 +219,22 @@ class PpItmConnector(BaseConnector):
 
     def _handle_get_email(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         self.save_progress("#####################################")
 
         stream = param.get("stream")
         fqid = param.get("fqid")
 
-        theEndpoint = "/activity/events/{fqid}/messages/default/contents/_raw?stream={stream}".format(fqid=fqid, stream=stream)
+        theEndpoint = f"/activity/events/{fqid}/messages/default/contents/_raw?stream={stream}"
 
         ret_val, response = self._make_rest_call(theEndpoint, action_result, params=None, headers=None, method="get")
 
-        self.save_progress("ret_val: {0}".format(ret_val))
-        self.save_progress("response: {0}".format(response))
+        self.save_progress(f"ret_val: {ret_val}")
+        self.save_progress(f"response: {response}")
 
         if phantom.is_fail(ret_val):
             self.save_progress("#####################################")
-            return action_result.set_status(phantom.APP_ERROR, "Error while executing Get E-mail action, response: {}".format(response))
+            return action_result.set_status(phantom.APP_ERROR, f"Error while executing Get E-mail action, response: {response}")
 
         action_result.add_data(response)
 
@@ -245,7 +244,7 @@ class PpItmConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_update_ticket(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress("#####################################")
 
@@ -253,17 +252,17 @@ class PpItmConnector(BaseConnector):
 
         post_data = {"id": param.get("assignee_id")}
 
-        theEndpoint = "/activity/events/{}/annotations/workflow/assignment".format(fqid)
+        theEndpoint = f"/activity/events/{fqid}/annotations/workflow/assignment"
 
         # make rest call
         ret_val, response = self._make_rest_call(theEndpoint, action_result, params=None, headers=None, json=post_data, method="put")
 
-        self.save_progress("response: {0}".format(response))
-        self.save_progress("ret_val: {0}".format(ret_val))
+        self.save_progress(f"response: {response}")
+        self.save_progress(f"ret_val: {ret_val}")
 
         if phantom.is_fail(ret_val):
             self.save_progress("#####################################")
-            return action_result.set_status(phantom.APP_ERROR, "Error during Assign Owner action executing, response: {}".format(response))
+            return action_result.set_status(phantom.APP_ERROR, f"Error during Assign Owner action executing, response: {response}")
 
         action_result.add_data(response)
 
@@ -274,21 +273,21 @@ class PpItmConnector(BaseConnector):
 
     def _handle_get_ticket(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         self.save_progress("#####################################")
 
         fqid = param.get("fqid", "")
-        theEndpoint = "/activity/events/{0}".format(fqid)
+        theEndpoint = f"/activity/events/{fqid}"
 
         # make rest call
         ret_val, response = self._make_rest_call(theEndpoint, action_result, params=None, headers=None)
 
-        self.save_progress("response: {0}".format(response))
-        self.save_progress("ret_val: {0}".format(ret_val))
+        self.save_progress(f"response: {response}")
+        self.save_progress(f"ret_val: {ret_val}")
 
         if phantom.is_fail(ret_val):
             self.save_progress("#####################################")
-            return action_result.set_status(phantom.APP_ERROR, "Error during Get Ticket action executing, response: {}".format(response))
+            return action_result.set_status(phantom.APP_ERROR, f"Error during Get Ticket action executing, response: {response}")
 
         construct_timeline = "{}/search/timeline?contextId={}&activityId={}&fqid={}&field=user.name&region=us-east-1&sources=email:pps"
         construct_timeline.format(self._base_url.replace("apis", "apps"), response["contextId"], response["partitionKey"], fqid)
@@ -306,23 +305,23 @@ class PpItmConnector(BaseConnector):
 
     def _handle_add_comment(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         self.save_progress("#####################################")
 
         fqid = param["fqid"]
         post_data = {"data": [{"alias": "string", "kind": param["kind"], "text": param["comment"]}]}
 
-        theEndpoint = "/activity/events/{fqid}/annotations/comments".format(fqid=fqid)
+        theEndpoint = f"/activity/events/{fqid}/annotations/comments"
 
         # make rest call
         ret_val, response = self._make_rest_call(theEndpoint, action_result, method="post", params=None, headers=None, json=post_data)
 
-        self.save_progress("ret_val: {0}".format(ret_val))
-        self.save_progress("response: {0}".format(response))
+        self.save_progress(f"ret_val: {ret_val}")
+        self.save_progress(f"response: {response}")
 
         if phantom.is_fail(ret_val):
             self.save_progress("#####################################")
-            return action_result.set_status(phantom.APP_ERROR, "Error during Add Comment action executing, response: {}".format(response))
+            return action_result.set_status(phantom.APP_ERROR, f"Error during Add Comment action executing, response: {response}")
 
         action_result.add_data(response)
 
@@ -333,7 +332,7 @@ class PpItmConnector(BaseConnector):
 
     def _handle_get_user(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         self.save_progress("#####################################")
 
         parameters = {
@@ -357,12 +356,12 @@ class PpItmConnector(BaseConnector):
         theEndpoint = "/auth/users"
 
         ret_val, response = self._make_rest_call(theEndpoint, action_result, params=parameters, headers=None, method="get")
-        self.save_progress("ret_val: {0}".format(ret_val))
-        self.save_progress("response: {0}".format(response))
+        self.save_progress(f"ret_val: {ret_val}")
+        self.save_progress(f"response: {response}")
 
         if phantom.is_fail(ret_val):
             self.save_progress("#####################################")
-            return action_result.set_status(phantom.APP_ERROR, "Error during Get Users action executing, response: {}".format(response))
+            return action_result.set_status(phantom.APP_ERROR, f"Error during Get Users action executing, response: {response}")
 
         action_result.add_data(response)
 
@@ -373,7 +372,7 @@ class PpItmConnector(BaseConnector):
 
     def _handle_set_status(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         self.save_progress("#####################################")
 
         fqid = param["fqid"]
@@ -386,17 +385,17 @@ class PpItmConnector(BaseConnector):
             }
         }
 
-        theEndpoint = "/activity/events/{fqid}/annotations/workflow".format(fqid=fqid)
+        theEndpoint = f"/activity/events/{fqid}/annotations/workflow"
 
         # make rest call
         ret_val, response = self._make_rest_call(theEndpoint, action_result, method="patch", params=None, headers=None, json=post_data)
 
-        self.save_progress("ret_val: {0}".format(ret_val))
-        self.save_progress("response: {0}".format(response))
+        self.save_progress(f"ret_val: {ret_val}")
+        self.save_progress(f"response: {response}")
 
         if phantom.is_fail(ret_val):
             self.save_progress("#####################################")
-            return action_result.set_status(phantom.APP_ERROR, "Error during Set Status action executing, response: {}".format(response))
+            return action_result.set_status(phantom.APP_ERROR, f"Error during Set Status action executing, response: {response}")
 
         action_result.add_data(response)
 
@@ -474,7 +473,6 @@ def main():
     password = args.password
     verify = args.verify
     if username is not None and password is None:
-
         # User specified a username but not a password, so ask
         import getpass
 
