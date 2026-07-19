@@ -15,12 +15,12 @@
             "name": "Patryk Dros"
         }
     ],
-    "license": "Copyright (c) Splunk, 2024-2025",
+    "license": "Copyright (c) Splunk, 2024-2026",
     "app_version": "1.0.1",
     "utctime_updated": "2024-06-16T04:47:50.741129Z",
     "package_name": "phantom_proofpointitm",
     "main_module": "proofpointitm_connector.py",
-    "min_phantom_version": "6.2.0.355",
+    "min_phantom_version": "6.3.0",
     "fips_compliant": false,
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -52,6 +52,12 @@
             "data_type": "password",
             "required": true,
             "order": 1
+        },
+        "verify_server_cert": {
+            "description": "Verify server SSL certificate",
+            "data_type": "boolean",
+            "default": true,
+            "order": 4
         }
     },
     "actions": [
@@ -824,12 +830,10 @@
             "versions": "EQ(*)"
         }
     ],
-    "custom_made": true,
-    "copied_from_id": 204,
-    "copied_from_version": "1.4.0",
-    "directory": "proofpointitm_7908bf1e-d56f-43f0-824d-d2caada4570c",
-    "version": 1,
-    "appname": "-",
-    "executable": "spawn3",
-    "disabled": false
+    "pip39_dependencies": {
+        "wheel": []
+    },
+    "pip313_dependencies": {
+        "wheel": []
+    }
 }
