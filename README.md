@@ -1,7 +1,7 @@
 # Proofpoint ITM
 
 Publisher: Splunk Community <br>
-Connector Version: 1.0.1 <br>
+Connector Version: 1.0.2 <br>
 Product Vendor: Proofpoint <br>
 Product Name: ITM <br>
 Minimum Product Version: 6.3.0
