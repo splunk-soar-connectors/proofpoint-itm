@@ -1,10 +1,10 @@
 # Proofpoint ITM
 
-Publisher: Splunk Community \
-Connector Version: 1.0.1 \
-Product Vendor: Proofpoint \
-Product Name: ITM \
-Minimum Product Version: 6.2.0.355
+Publisher: Splunk Community <br>
+Connector Version: 1.0.1 <br>
+Product Vendor: Proofpoint <br>
+Product Name: ITM <br>
+Minimum Product Version: 6.3.0
 
 Proofpoint ITM 4 SOAR - Also know as ObserveIT by Proofpoint, or Proofpoint Insider Threat Management
 
@@ -36,22 +36,23 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **api_version** | optional | string | API version: v1 / v2 / v3 |
 **client_id** | required | string | Client ID |
 **client_secret** | required | password | Client Secret |
+**verify_server_cert** | optional | boolean | Verify server SSL certificate |
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration \
-[get email](#action-get-email) - Get an email from the server \
-[assign owner](#action-assign-owner) - Update ticket (issue) to be owned by this person \
-[get ticket](#action-get-ticket) - Get ticket (issue) information \
-[add comment](#action-add-comment) - Add a comment to a ticket \
-[get user](#action-get-user) - Get User details \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration <br>
+[get email](#action-get-email) - Get an email from the server <br>
+[assign owner](#action-assign-owner) - Update ticket (issue) to be owned by this person <br>
+[get ticket](#action-get-ticket) - Get ticket (issue) information <br>
+[add comment](#action-add-comment) - Add a comment to a ticket <br>
+[get user](#action-get-user) - Get User details <br>
 [set status](#action-set-status) - Set ticket (issue) status
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity using supplied configuration
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -66,7 +67,7 @@ No Output
 
 Get an email from the server
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -95,7 +96,7 @@ summary.total_objects_successful | numeric | | |
 
 Update ticket (issue) to be owned by this person
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 Assign Ticket to user as per the UI values in PP ITM Portal.
@@ -137,7 +138,7 @@ summary.total_objects_successful | numeric | | |
 
 Get ticket (issue) information
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -177,7 +178,7 @@ summary.total_objects_successful | numeric | | |
 
 Add a comment to a ticket
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -206,7 +207,7 @@ summary.total_objects_successful | numeric | | |
 
 Get User details
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Get a list of all users and their user attributes, or search the system for a single user id by username/string all values are optional.
@@ -251,7 +252,7 @@ summary.total_objects_successful | numeric | | |
 
 Set ticket (issue) status
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -286,7 +287,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

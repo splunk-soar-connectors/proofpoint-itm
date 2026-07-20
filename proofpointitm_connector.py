@@ -1,6 +1,6 @@
 # File: proofpointitm_connector.py
 #
-# Copyright (c) Splunk, 2024-2025
+# Copyright (c) Splunk, 2024-2026
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 
 
 import json
+from urllib.parse import quote
 
 # Phantom App imports
 import phantom.app as phantom
@@ -148,7 +149,7 @@ class PpItmConnector(BaseConnector):
         self.save_progress("#GET-TOK:  Connecting to API Endpoint and posting id/secret as headers")
 
         try:
-            response = requests.post(url, json=payload, headers=headers, timeout=30)
+            response = requests.post(url, json=payload, headers=headers, timeout=30, verify=self._verify)
             self.save_progress("#GET-TOK: POST request sent for AUTH TOKEN ----#")
         except Exception as e:
             self.error_print("#GET-TOK: Error while conecting to server for AUTH TOKEN: ", e)
@@ -169,7 +170,6 @@ class PpItmConnector(BaseConnector):
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
-        config = self.get_config()
         resp_json = None
 
         if not self._access_token:
@@ -192,7 +192,7 @@ class PpItmConnector(BaseConnector):
             r = request_func(
                 url,
                 # auth=(username, password),  # basic authentication
-                verify=config.get("verify_server_cert", False),
+                verify=self._verify,
                 **kwargs,
             )
         except Exception as e:
@@ -223,11 +223,11 @@ class PpItmConnector(BaseConnector):
         self.save_progress("#####################################")
 
         stream = param.get("stream")
-        fqid = param.get("fqid")
+        fqid = quote(str(param.get("fqid", "")), safe="")
 
-        theEndpoint = f"/activity/events/{fqid}/messages/default/contents/_raw?stream={stream}"
+        theEndpoint = f"/activity/events/{fqid}/messages/default/contents/_raw"
 
-        ret_val, response = self._make_rest_call(theEndpoint, action_result, params=None, headers=None, method="get")
+        ret_val, response = self._make_rest_call(theEndpoint, action_result, params={"stream": stream}, headers=None, method="get")
 
         self.save_progress(f"ret_val: {ret_val}")
         self.save_progress(f"response: {response}")
@@ -248,7 +248,7 @@ class PpItmConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress("#####################################")
 
-        fqid = param["fqid"]
+        fqid = quote(str(param["fqid"]), safe="")
 
         post_data = {"id": param.get("assignee_id")}
 
@@ -276,7 +276,7 @@ class PpItmConnector(BaseConnector):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         self.save_progress("#####################################")
 
-        fqid = param.get("fqid", "")
+        fqid = quote(str(param.get("fqid", "")), safe="")
         theEndpoint = f"/activity/events/{fqid}"
 
         # make rest call
@@ -308,7 +308,7 @@ class PpItmConnector(BaseConnector):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         self.save_progress("#####################################")
 
-        fqid = param["fqid"]
+        fqid = quote(str(param["fqid"]), safe="")
         post_data = {"data": [{"alias": "string", "kind": param["kind"], "text": param["comment"]}]}
 
         theEndpoint = f"/activity/events/{fqid}/annotations/comments"
@@ -385,7 +385,7 @@ class PpItmConnector(BaseConnector):
             }
         }
 
-        theEndpoint = f"/activity/events/{fqid}/annotations/workflow"
+        theEndpoint = f"/activity/events/{quote(str(fqid), safe='')}/annotations/workflow"
 
         # make rest call
         ret_val, response = self._make_rest_call(theEndpoint, action_result, method="patch", params=None, headers=None, json=post_data)
@@ -446,6 +446,7 @@ class PpItmConnector(BaseConnector):
         self._base_url = "{base_url}/{api_version}/apis".format(base_url=config["base_url"], api_version=config.get("api_version"))
         self._client_id = config["client_id"]
         self._client_secret = config["client_secret"]
+        self._verify = config.get("verify_server_cert", True)
 
         return phantom.APP_SUCCESS
 
